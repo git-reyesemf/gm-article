@@ -1,0 +1,34 @@
+openapi: 3.0.1
+info:
+  description: This is a sample for catalog documentation. you should change the default
+    parameters generated for this project
+  version: 1.0.0
+  title: taxes-exclusion
+servers:
+  - url: server_url_should_be_change_by_users
+tags:
+  - name: ping
+    description: ''
+  - name: billing
+    description: ''
+paths:
+  /ping:
+    parameters: [ ]
+    get:
+      tags:
+        - ping
+      summary: ''
+      description: test
+      responses:
+        '200':
+          description: Success response
+  /billing/padrones/.*:
+    parameters: [ ]
+    get:
+      tags:
+        - billing
+      summary: ''
+      description: ''
+      responses:
+        '200':
+          description: Success response.

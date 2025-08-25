@@ -1,0 +1,85 @@
+# ===================================================================
+# COMMON SPRING BOOT PROPERTIES
+# ===================================================================
+
+application-name: 'gm-article'
+
+# EMBEDDED SERVER CONFIGURATION (ServerProperties)
+server:
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+# ----------------------------------------
+# CORE PROPERTIES
+# ----------------------------------------
+spring:
+
+  main:
+    allow-bean-definition-overriding: false
+
+  profiles:
+    active: '${SCOPE_SUFFIX}'
+
+  # ----------------------------------------
+  # WEB PROPERTIES
+  # ----------------------------------------
+
+  # SPRING MVC (WebMvcProperties)
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  # SPRING RESOURCES HANDLING (ResourceProperties)
+  # ----------------------------------------
+  # DATA PROPERTIES
+  # ----------------------------------------
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+      enabled: true
+
+  # JPA (JpaBaseConfiguration, HibernateJpaAutoConfiguration)
+  jpa:
+    open-in-view: false
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      jakarta:
+        persistence:
+          sharedCache:
+            mode: ENABLE_SELECTIVE
+      hibernate:
+        order_updates: true
+        batch_versioned_data: true
+        jdbc:
+          batch_size: 10
+        connection:
+          # https://bit.ly/2zgLKhu
+          provider_disables_autocommit: true
+        format_sql: true
+        generate_statistics: false
+  #        cache:
+  #          use_second_level_cache: true
+  #          use_query_cache: true
+  #          region:
+  #            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+
+  batch:
+    job:
+      enabled: false
+  web:
+    resources:
+      add-mappings: false
+
+# ----------------------------------------
+# APPLICATION PROPERTIES
+# ----------------------------------------
+logging:
+  level:
+    root: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: DEBUG

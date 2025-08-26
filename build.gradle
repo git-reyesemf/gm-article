@@ -63,7 +63,6 @@ dependencies {
         exclude group: 'junit', module: 'junit'
     }
     testImplementation('com.h2database:h2:2.1.210')
-    runtimeOnly('com.h2database:h2:2.1.210')
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.9.2')
     testImplementation('org.junit.jupiter:junit-jupiter-engine:5.9.2')
     testImplementation('org.junit.platform:junit-platform-launcher:1.9.2')

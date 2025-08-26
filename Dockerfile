@@ -23,4 +23,4 @@ RUN ./gradlew build -x test
 EXPOSE 8080
 
 # Run the application
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -Dspring.profiles.active=test -jar build/libs/gm-article-0.0.1-SNAPSHOT.jar"]
+CMD ["sh", "-c", "echo 'DEBUG: Environment variables:' && echo 'DATABASE_URL='$DATABASE_URL && echo 'DB_USERNAME='$DB_USERNAME && echo 'DB_PASSWORD='$DB_PASSWORD && echo 'SCOPE_SUFFIX='$SCOPE_SUFFIX && echo 'Starting application...' && java -Dserver.port=${PORT:-8080} -Dspring.profiles.active=${SCOPE_SUFFIX:-test} -jar build/libs/gm-article-0.0.1-SNAPSHOT.jar"]

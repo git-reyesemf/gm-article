@@ -2,37 +2,51 @@ package com.reyesemf.gm.article.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 
-@Configuration
+@Component
 public class EnvironmentDebugger {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentDebugger.class);
-    
-    @Value("${DATABASE_URL:NOT_SET}")
-    private String databaseUrl;
-    
-    @Value("${DB_USERNAME:NOT_SET}")
-    private String dbUsername;
-    
-    @Value("${DB_PASSWORD:NOT_SET}")
-    private String dbPassword;
-    
+
+    @Autowired
+    private Environment environment;
+
     @PostConstruct
     public void debugEnvironment() {
-        logger.info("=== ENVIRONMENT VARIABLES DEBUG ===");
-        logger.info("DATABASE_URL: {}", databaseUrl.length() > 50 ? databaseUrl.substring(0, 50) + "..." : databaseUrl);
-        logger.info("DB_USERNAME: {}", dbUsername);
-        logger.info("DB_PASSWORD: {}", dbPassword.length() > 5 ? dbPassword.substring(0, 5) + "..." : dbPassword);
-        logger.info("=== END DEBUG ===");
+        logger.info("=== ENVIRONMENT DEBUG ===");
+        logger.info("Active profiles: {}", String.join(", ", environment.getActiveProfiles()));
         
-        // También imprimir variables de entorno del sistema
-        logger.info("System DATABASE_URL: {}", System.getenv("DATABASE_URL") != null ? "SET" : "NOT_SET");
-        logger.info("System DB_USERNAME: {}", System.getenv("DB_USERNAME") != null ? "SET" : "NOT_SET");
-        logger.info("System DB_PASSWORD: {}", System.getenv("DB_PASSWORD") != null ? "SET" : "NOT_SET");
-        logger.info("System SCOPE_SUFFIX: {}", System.getenv("SCOPE_SUFFIX"));
+        // Debug database variables
+        String databaseUrl = environment.getProperty("DATABASE_URL");
+        String dbUsername = environment.getProperty("DB_USERNAME");
+        String dbPassword = environment.getProperty("DB_PASSWORD");
+        
+        logger.info("DATABASE_URL present: {}", databaseUrl != null);
+        logger.info("DB_USERNAME present: {}", dbUsername != null);
+        logger.info("DB_PASSWORD present: {}", dbPassword != null);
+        
+        if (databaseUrl != null) {
+            logger.info("DATABASE_URL starts with: {}", databaseUrl.substring(0, Math.min(20, databaseUrl.length())));
+        }
+        if (dbUsername != null) {
+            logger.info("DB_USERNAME: {}", dbUsername);
+        }
+        if (dbPassword != null) {
+            logger.info("DB_PASSWORD starts with: {}", dbPassword.substring(0, Math.min(5, dbPassword.length())));
+        }
+        
+        // Debug all environment variables that start with DB or DATABASE
+        logger.info("=== ALL DB RELATED ENV VARS ===");
+        System.getenv().entrySet().stream()
+            .filter(entry -> entry.getKey().startsWith("DB") || entry.getKey().startsWith("DATABASE"))
+            .forEach(entry -> logger.info("ENV: {} = {}", entry.getKey(), 
+                entry.getValue() != null ? entry.getValue().substring(0, Math.min(20, entry.getValue().length())) + "..." : "null"));
+        
+        logger.info("=== END ENVIRONMENT DEBUG ===");
     }
 }

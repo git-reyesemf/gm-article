@@ -23,4 +23,4 @@ RUN ./gradlew build -x test
 EXPOSE 8080
 
 # Run the application
-CMD ["java", "-Dserver.port=${PORT:-8080}", "-Dspring.profiles.active=test", "-jar", "build/libs/gm-article-*.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -Dspring.profiles.active=test -jar build/libs/gm-article-*.jar"]

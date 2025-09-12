@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    Optional<Article> findBySlug(String slug);
+    @Query("SELECT a FROM Article a WHERE a.slug = :slug")
+    Optional<Article> findBySlug(@Param("slug") String slug);
     
     @Query("SELECT a FROM Article a JOIN a.category c WHERE c.slug = :categorySlug")
     List<Article> findAllByCategorySlug(@Param("categorySlug") String categorySlug);

@@ -1,5 +1,6 @@
 package com.reyesemf.gm.article.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -40,9 +41,9 @@ public class Article extends DomainEntity {
     @Column(name = "url", nullable = false, length = 256)
     private String url;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonIgnoreProperties({"articles"})
     private Category category;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -53,6 +54,7 @@ public class Article extends DomainEntity {
     )
     private List<Media> relatedMedia;
 
+    @JsonIgnore
     @JsonProperty("category_slug")
     private transient String categorySlug;
 

@@ -41,8 +41,8 @@ public class Category extends DomainEntity {
     @Column(name = "url", nullable = false, length = 256)
     private String url;
 
-    @OneToMany(mappedBy = "category", cascade = ALL)
     @JsonIgnore
+    @OneToMany(mappedBy = "category", cascade = ALL)
     private List<Article> articles;
 
     public String getName() {

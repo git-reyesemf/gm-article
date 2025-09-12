@@ -58,6 +58,20 @@ public class ArticleServiceImplTest {
     }
 
     @Test
+    public void givenPreloadedSlugWhenGetBySlugThenReturnsCorrectArticle() {
+        Article result = articleService.getBySlug("mobil-1-advanced-5w30");
+        
+        assertNotNull(result);
+        assertEquals("Mobil 1 Advanced Full Synthetic 5W-30", result.getName());
+        assertEquals("mobil-1-advanced-5w30", result.getSlug());
+        assertEquals("Aceite sintético premium que proporciona protección excepcional del motor por hasta 16,000 km. API SN Plus, ILSAC GF-5.", result.getDescription());
+        assertEquals("https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop", result.getImage());
+        assertEquals("/articulo/mobil-1-advanced-5w30", result.getUrl());
+        assertNotNull(result.getCategory());
+        assertEquals("automotores", result.getCategory().getSlug());
+    }
+
+    @Test
     public void givenValidArticleWhenCreateOrUpdateThenGeneratesCorrectSlug() {
         Category category = createAndSaveCategory("Books", "books");
         Article article = createValidArticle("Book Review", "Amazing book analysis", "https://example.com/books.jpg", "https://example.com/books", "books");

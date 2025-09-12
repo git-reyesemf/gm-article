@@ -39,8 +39,8 @@ public class Media extends DomainEntity {
     @Column(name = "url", nullable = false, length = 256)
     private String url;
 
-    @ManyToMany(mappedBy = "relatedMedia")
     @JsonIgnore
+    @ManyToMany(mappedBy = "relatedMedia")
     private List<Article> articles;
 
     public String getName() {

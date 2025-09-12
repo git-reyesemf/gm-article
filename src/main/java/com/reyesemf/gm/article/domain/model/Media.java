@@ -1,29 +1,28 @@
 package com.reyesemf.gm.article.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.util.List;
 
 @Entity
-@Table(name = Article.NAME,
+@Table(name = Media.NAME,
         uniqueConstraints = {
                 @UniqueConstraint(
-                name = "article_name_uk",
+                name = "media_name_uk",
                 columnNames = {"name"}),
                 @UniqueConstraint(
-                name = "article_slug_uk",
+                name = "media_slug_uk",
                 columnNames = {"slug"})
         }
 )
-public class Article extends DomainEntity {
+public class Media extends DomainEntity {
 
-    public static final String NAME = "article";
+    public static final String NAME = "media";
 
     @Serial
-    private static final long serialVersionUID = 851372619485730127L;
+    private static final long serialVersionUID = 851372619485730126L;
 
     @Column(name = "name", nullable = false, length = 32)
     private String name;
@@ -40,21 +39,9 @@ public class Article extends DomainEntity {
     @Column(name = "url", nullable = false, length = 256)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    @JsonIgnoreProperties({"articles"})
-    private Category category;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "article_media",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "media_id")
-    )
-    private List<Media> relatedMedia;
-
-    @JsonProperty("category_slug")
-    private transient String categorySlug;
+    @ManyToMany(mappedBy = "relatedMedia")
+    @JsonIgnore
+    private List<Article> articles;
 
     public String getName() {
         return name;
@@ -96,28 +83,12 @@ public class Article extends DomainEntity {
         this.url = url;
     }
 
-    public Category getCategory() {
-        return category;
+    public List<Article> getArticles() {
+        return articles;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public String getCategorySlug() {
-        return categorySlug;
-    }
-
-    public void setCategorySlug(String categorySlug) {
-        this.categorySlug = categorySlug;
-    }
-
-    public List<Media> getRelatedMedia() {
-        return relatedMedia;
-    }
-
-    public void setRelatedMedia(List<Media> relatedMedia) {
-        this.relatedMedia = relatedMedia;
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
     }
 
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("local")
 @Transactional
+@Sql(scripts = "classpath:/db/mysql/schema.sql")
+@Sql(scripts = "classpath:/db/mysql/data.sql")
 public class ArticleServiceImplTest {
 
     @Autowired
@@ -28,18 +31,30 @@ public class ArticleServiceImplTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+
     @Test
-    public void givenValidArticleWhenCreateOrUpdateThenSuccess() {
-        Category category = createAndSaveCategory("Electronics", "electronics");
-        Article article = createValidArticle("Electronics", "Electronic gadgets", "https://example.com/electronics.jpg", "https://example.com/electronics", "electronics");
+    public void givenValidSlugWhenGetBySlugThenReturnsArticle() {
+        Category category = createAndSaveCategory("Books", "books");
+        Article article = createValidArticle("Book Guide", "Complete book guide", "https://example.com/guide.jpg", "https://example.com/guide", "books");
+        Article savedArticle = articleService.createOrUpdate(article);
         
-        Article saved = articleService.createOrUpdate(article);
+        Article result = articleService.getBySlug(savedArticle.getSlug());
         
-        assertNotNull(saved);
-        assertNotNull(saved.getId());
-        assertEquals("Electronics", saved.getName());
-        assertEquals("electronics", saved.getSlug());
-        assertEquals(category.getId(), saved.getCategory().getId());
+        assertNotNull(result);
+        assertEquals(savedArticle.getId(), result.getId());
+        assertEquals("Book Guide", result.getName());
+        assertEquals("book-guide", result.getSlug());
+        assertEquals("Complete book guide", result.getDescription());
+    }
+
+    @Test
+    public void givenNonExistentSlugWhenGetBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> articleService.getBySlug("non-existent-slug"));
+    }
+
+    @Test
+    public void givenNullSlugWhenGetBySlugThenThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> articleService.getBySlug(null));
     }
 
     @Test
@@ -70,19 +85,18 @@ public class ArticleServiceImplTest {
     public void givenExistingArticleWhenCreateOrUpdateThenUpdatesExistingArticle() {
         Category category = createAndSaveCategory("Sports", "sports");
         
-        Article savedArticle = createValidArticle("Old Sports", "Old description", "https://old.com/image.jpg", "https://old.com/sports", "sports");
-        savedArticle.setSlug("old-sports");
-        savedArticle = articleRepository.save(savedArticle);
+        Article initialArticle = createValidArticle("Old Sports", "Old description", "https://old.com/image.jpg", "https://old.com/sports", "sports");
+        Article savedArticle = articleService.createOrUpdate(initialArticle);
         
         Article updateCandidate = createValidArticle("Updated Sports", "Updated description", "https://updated.com/image.jpg", "https://updated.com/sports", "sports");
-        updateCandidate.setSlug("old-sports");
+        updateCandidate.setSlug(savedArticle.getSlug());
         
         Article result = articleService.createOrUpdate(updateCandidate);
         
         assertNotNull(result);
         assertEquals("Updated Sports", result.getName());
-        assertEquals("updated-sports", result.getSlug());
         assertEquals("Updated description", result.getDescription());
+        assertEquals(savedArticle.getId(), result.getId());
     }
 
     @Test
@@ -155,39 +169,32 @@ public class ArticleServiceImplTest {
     }
 
     @Test
-    public void givenValidArticleWhenDeleteThenRemovesFromRepository() {
+    public void givenValidArticleWhenDeleteBySlugThenRemovesFromRepository() {
         Category category = createAndSaveCategory("Sports", "sports");
         Article article = createValidArticle("Sports", "Sports equipment", "https://example.com/sports.jpg", "https://example.com/sports", "sports");
-        article.setSlug("sports");
-        Article savedArticle = articleRepository.save(article);
+        Article savedArticle = articleService.createOrUpdate(article);
         Long articleId = savedArticle.getId();
         
         assertTrue(articleRepository.existsById(articleId));
         
-        articleService.delete(savedArticle);
+        articleService.deleteBySlug(savedArticle.getSlug());
         
         assertFalse(articleRepository.existsById(articleId));
     }
 
     @Test
-    public void givenNullArticleWhenDeleteThenThrowsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> articleService.delete(null));
+    public void givenNullSlugWhenDeleteBySlugThenThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> articleService.deleteBySlug(null));
     }
 
     @Test
-    public void givenArticleWithNullIdWhenDeleteThenThrowsNullPointerException() {
-        Article article = new Article();
-        article.setId(null);
-        
-        assertThrows(NullPointerException.class, () -> articleService.delete(article));
+    public void givenEmptySlugWhenDeleteBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> articleService.deleteBySlug(""));
     }
 
     @Test
-    public void givenNonExistentArticleWhenDeleteThenThrowsEntityNotFoundException() {
-        Article article = new Article();
-        article.setId(999L);
-        
-        assertThrows(EntityNotFoundException.class, () -> articleService.delete(article));
+    public void givenNonExistentSlugWhenDeleteBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> articleService.deleteBySlug("non-existent-slug"));
     }
 
     private Article createValidArticle(String name, String description, String image, String url, String categorySlug) {
@@ -197,7 +204,6 @@ public class ArticleServiceImplTest {
         article.setImage(image);
         article.setUrl(url);
         article.setCategorySlug(categorySlug);
-        // Set a dummy category to pass validation - the service will replace it
         Category dummyCategory = new Category();
         dummyCategory.setName("dummy");
         article.setCategory(dummyCategory);
@@ -211,7 +217,6 @@ public class ArticleServiceImplTest {
         article.setImage(image);
         article.setUrl(url);
         article.setCategorySlug(categorySlug);
-        // Set a dummy category to pass validation - the service will replace it
         Category dummyCategory = new Category();
         dummyCategory.setName("dummy");
         article.setCategory(dummyCategory);

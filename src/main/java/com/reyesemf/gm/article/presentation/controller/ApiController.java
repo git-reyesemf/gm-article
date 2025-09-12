@@ -4,6 +4,8 @@ import com.reyesemf.gm.article.datasource.repository.ArticleRepository;
 import com.reyesemf.gm.article.datasource.repository.CategoryRepository;
 import com.reyesemf.gm.article.domain.model.Article;
 import com.reyesemf.gm.article.domain.model.Category;
+import com.reyesemf.gm.article.domain.service.ArticleService;
+import com.reyesemf.gm.article.domain.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,21 +28,16 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ApiController {
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ArticleService articleService;
+    
+    @Autowired
+    private CategoryService categoryService;
     
     @Autowired
     private ArticleRepository articleRepository;
-
-    @GetMapping("/test")
-    @Operation(summary = "Test de conectividad", description = "Endpoint de prueba para verificar conectividad")
-    public ResponseEntity<String> test() {
-        try {
-            long count = categoryRepository.count();
-            return ok("✅ Conectado! Categorías en DB: " + count);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("❌ Error: " + e.getMessage());
-        }
-    }
+    
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @GetMapping("/category")
     @Operation(summary = "Obtener todas las categorías", description = "Devuelve una lista con todas las categorías disponibles")
@@ -61,6 +58,18 @@ public class ApiController {
             @Parameter(description = "Slug de la categoría", required = true)
             @PathVariable("category_slug") String categorySlug) {
         return ok(articleRepository.findAllByCategorySlug(categorySlug));
+    }
+
+    @GetMapping("/article/{article_slug}")
+    @Operation(summary = "Obtener artículo", description = "Devuelve todos los atributos de un artículo usando su slug")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Artículo obtenido exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Artículo no encontrado")
+    })
+    public ResponseEntity<Article> getArticle(
+            @Parameter(description = "Slug del artículo", required = true)
+            @PathVariable("article_slug") String articleSlug) {
+        return ok(articleService.getBySlug(articleSlug));
     }
 
 }

@@ -46,11 +46,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Category candidate) {
-        requireNonNull(candidate, "Category must be not null");
-        requireNonNull(candidate.getId(), "Category.id must be not null");
-        categoryRepository.findById(candidate.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Not found category_id: " + candidate.getId()));
+    public Category getBySlug(String categorySlug) {
+        requireNonNull(categorySlug, "Category Slug must be not null");
+        return categoryRepository.findBySlug(categorySlug)
+                .orElseThrow(() -> new EntityNotFoundException("Not found category with slug: " + categorySlug));
+    }
+
+    @Override
+    public void deleteBySlug(String categorySlug) {
+        requireNonNull(categorySlug, "Category Slug must be not null");
+        Category candidate = categoryRepository.findBySlug(categorySlug)
+                .orElseThrow(() -> new EntityNotFoundException("Not found Category with slug: " + categorySlug));
         categoryRepository.deleteById(candidate.getId());
     }
 

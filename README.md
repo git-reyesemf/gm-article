@@ -23,6 +23,12 @@ $ ./gradlew build
 $ ./gradlew test
 ```
 
+## Servidor local
+
+```
+$ ./gradlew bootRun --args='--spring.profiles.active=local'
+```
+
 ## Despliegue
 
 ```

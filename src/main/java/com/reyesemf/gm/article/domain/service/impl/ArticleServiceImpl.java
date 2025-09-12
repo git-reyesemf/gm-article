@@ -54,11 +54,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void delete(Article candidate) {
-        requireNonNull(candidate, "Article must be not null");
-        requireNonNull(candidate.getId(), "Article.id must be not null");
-        articleRepository.findById(candidate.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Not found article_id: " + candidate.getId()));
+    public Article getBySlug(String articleSlug) {
+        requireNonNull(articleSlug, "Article Slug must be not null");
+        return articleRepository.findBySlug(articleSlug)
+                .orElseThrow(() -> new EntityNotFoundException("Not found article with slug: " + articleSlug));
+    }
+
+    @Override
+    public void deleteBySlug(String articleSlug) {
+        requireNonNull(articleSlug, "Article Slug must be not null");
+        Article candidate = articleRepository.findBySlug(articleSlug)
+                .orElseThrow(() -> new EntityNotFoundException("Not found Article with slug: " + articleSlug));
         articleRepository.deleteById(candidate.getId());
     }
 

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("local")
 @Transactional
+@Sql(scripts = "classpath:/db/mysql/schema.sql")
+@Sql(scripts = "classpath:/db/mysql/data.sql")
 public class CategoryServiceImplTest {
 
     @Autowired
@@ -25,7 +28,6 @@ public class CategoryServiceImplTest {
 
     @Test
     public void givenDatabaseInitializedWhenSaveCategoryThenSuccess() {
-        // Test directo del repositorio para verificar que la BD funciona
         Category category = new Category();
         category.setName("Books");
         category.setSlug("books");
@@ -40,10 +42,33 @@ public class CategoryServiceImplTest {
         assertEquals("Books", saved.getName());
         assertEquals("books", saved.getSlug());
         
-        // Verificar que se puede recuperar
         Category found = categoryRepository.findById(saved.getId()).orElse(null);
         assertNotNull(found);
         assertEquals("Books", found.getName());
+    }
+
+    @Test
+    public void givenValidSlugWhenGetBySlugThenReturnsCategory() {
+        Category category = createValidCategory("Technology", "Tech products and services", "https://example.com/tech.jpg", "https://example.com/tech");
+        Category savedCategory = categoryService.createOrUpdate(category);
+        
+        Category result = categoryService.getBySlug(savedCategory.getSlug());
+        
+        assertNotNull(result);
+        assertEquals(savedCategory.getId(), result.getId());
+        assertEquals("Technology", result.getName());
+        assertEquals("technology", result.getSlug());
+        assertEquals("Tech products and services", result.getDescription());
+    }
+
+    @Test
+    public void givenNonExistentSlugWhenGetBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> categoryService.getBySlug("non-existent-slug"));
+    }
+
+    @Test
+    public void givenNullSlugWhenGetBySlugThenThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> categoryService.getBySlug(null));
     }
 
     @Test
@@ -70,20 +95,18 @@ public class CategoryServiceImplTest {
 
     @Test
     public void givenExistingCategoryWhenCreateOrUpdateThenUpdatesExistingCategory() {
-        // First create a category to update
         Category savedCategory = createValidCategory("Old Books", "Old description", "https://old.com/image.jpg", "https://old.com/books");
         savedCategory.setSlug("old-books");
         savedCategory = categoryRepository.save(savedCategory);
         
-        // Create update candidate with existing slug
         Category updateCandidate = createValidCategory("Updated Books", "Updated description", "https://updated.com/image.jpg", "https://updated.com/books");
-        updateCandidate.setSlug("old-books"); // Use existing slug to trigger update path
+        updateCandidate.setSlug("old-books");
         
         Category result = categoryService.createOrUpdate(updateCandidate);
         
         assertNotNull(result);
         assertEquals("Updated Books", result.getName());
-        assertEquals("updated-books", result.getSlug()); // Slug gets regenerated from name
+        assertEquals("updated-books", result.getSlug());
         assertEquals("Updated description", result.getDescription());
         assertEquals("https://updated.com/image.jpg", result.getImage());
         assertEquals("https://updated.com/books", result.getUrl());
@@ -119,38 +142,31 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void givenValidCategoryWhenDeleteThenRemovesFromRepository() {
+    public void givenValidSlugWhenDeleteBySlugThenRemovesFromRepository() {
         Category category = createValidCategory("Sports", "Sports equipment", "https://example.com/sports.jpg", "https://example.com/sports");
-        category.setSlug("sports"); // Set slug before saving
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryService.createOrUpdate(category);
         Long categoryId = savedCategory.getId();
         
         assertTrue(categoryRepository.existsById(categoryId));
         
-        categoryService.delete(savedCategory);
+        categoryService.deleteBySlug(savedCategory.getSlug());
         
         assertFalse(categoryRepository.existsById(categoryId));
     }
 
     @Test
-    public void givenNonExistentCategoryWhenDeleteThenThrowsEntityNotFoundException() {
-        Category category = new Category();
-        category.setId(99999L);
-        
-        assertThrows(EntityNotFoundException.class, () -> categoryService.delete(category));
+    public void givenNonExistentSlugWhenDeleteBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> categoryService.deleteBySlug("non-existent-slug"));
     }
 
     @Test
-    public void givenNullCategoryWhenDeleteThenThrowsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> categoryService.delete(null));
+    public void givenNullSlugWhenDeleteBySlugThenThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> categoryService.deleteBySlug(null));
     }
 
     @Test
-    public void givenCategoryWithNullIdWhenDeleteThenThrowsNullPointerException() {
-        Category category = new Category();
-        category.setId(null);
-        
-        assertThrows(NullPointerException.class, () -> categoryService.delete(category));
+    public void givenEmptySlugWhenDeleteBySlugThenThrowsEntityNotFoundException() {
+        assertThrows(EntityNotFoundException.class, () -> categoryService.deleteBySlug(""));
     }
 
     @Test

@@ -4,5 +4,6 @@ import com.reyesemf.gm.article.domain.model.Category;
 
 public interface CategoryService {
     Category createOrUpdate(Category category);
-    void delete(Category category);
+    Category getBySlug(String categorySlug);
+    void deleteBySlug(String categorySlug);
 }

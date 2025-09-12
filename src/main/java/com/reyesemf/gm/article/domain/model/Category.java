@@ -26,7 +26,7 @@ public class Category extends DomainEntity {
     @Serial
     private static final long serialVersionUID = 851372619485730126L;
 
-    @Column(name = "name", nullable = false, length = 16)
+    @Column(name = "name", nullable = false, length = 32)
     private String name;
 
     @Column(name = "slug", nullable = false, length = 32)
@@ -35,10 +35,10 @@ public class Category extends DomainEntity {
     @Column(name = "description", nullable = false, length = 128)
     private String description;
 
-    @Column(name = "image", nullable = false, length = 512)
+    @Column(name = "image", nullable = false, length = 256)
     private String image;
 
-    @Column(name = "url", nullable = false, length = 512)
+    @Column(name = "url", nullable = false, length = 256)
     private String url;
 
     @OneToMany(mappedBy = "category", cascade = ALL)

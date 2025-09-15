@@ -1,5 +1,6 @@
 package com.reyesemf.gm.article.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -16,10 +17,12 @@ public abstract class DomainEntity extends DomainObject {
     @Serial
     private static final long serialVersionUID = 673849201837465092L;
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @Version
     @Column(name = "version", nullable = false, columnDefinition = "integer default 0")
     private Integer version;

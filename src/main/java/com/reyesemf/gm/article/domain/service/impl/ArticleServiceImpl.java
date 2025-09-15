@@ -67,10 +67,7 @@ public class ArticleServiceImpl implements ArticleService {
         requireNonNull(articleSlug, "Article Slug must be not null");
         Article article = articleRepository.findBySlug(articleSlug)
                 .orElseThrow(() -> new EntityNotFoundException("Not found article with slug: " + articleSlug));
-        
-        // Forzar inicialización de relatedMedia dentro de la transacción
         article.getRelatedMedia().size();
-        
         return article;
     }
 

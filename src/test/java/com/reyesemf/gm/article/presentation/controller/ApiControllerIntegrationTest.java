@@ -72,11 +72,12 @@ class ApiControllerIntegrationTest {
     void getArticle_ShouldReturnSpecificArticleWithStatus200() throws Exception {
         mockMvc.perform(get("/api/article/{articleSlug}", "mobil-1-advanced-5w30")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> System.out.println("JSON Response: " + result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name", is("Mobil 1 Advanced Full Synthetic 5W-30")))
                 .andExpect(jsonPath("$.slug", is("mobil-1-advanced-5w30")))
                 .andExpect(jsonPath("$.description", containsString("Aceite sintético premium")))
-                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")));;
+                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")));
     }
 }

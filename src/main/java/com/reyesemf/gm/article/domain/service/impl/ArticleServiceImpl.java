@@ -1,16 +1,17 @@
 package com.reyesemf.gm.article.domain.service.impl;
 
 import com.reyesemf.gm.article.datasource.repository.ArticleRepository;
-import com.reyesemf.gm.article.datasource.repository.CategoryRepository;
 import com.reyesemf.gm.article.domain.model.Article;
 import com.reyesemf.gm.article.domain.model.Category;
 import com.reyesemf.gm.article.domain.service.ArticleService;
+import com.reyesemf.gm.article.domain.service.CategoryService;
 import com.reyesemf.gm.article.infrastructure.ArticleValidator;
 import com.reyesemf.gm.article.infrastructure.Sluggify;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,10 +24,17 @@ public class ArticleServiceImpl implements ArticleService {
     private final Function<String, String> sluggify = new Sluggify();
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private CategoryService categoryService;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ArticleRepository articleRepository;
+
+
+    @Override
+    public List<Article> getAllByCategorySlug(String categorySlug) {
+        Category category = categoryService.getBySlug(categorySlug);
+        return articleRepository.findAllByCategoryId(category.getId());
+    }
 
     @Override
     public Article createOrUpdate(Article candidate) {
@@ -40,8 +48,7 @@ public class ArticleServiceImpl implements ArticleService {
             article = new Article();
         }
 
-        Category category = categoryRepository.findBySlug(candidate.getCategorySlug())
-                        .orElseThrow(() -> new EntityNotFoundException("Not found category with slug: " + candidate.getCategorySlug()));
+        Category category = categoryService.getBySlug(candidate.getCategorySlug());
 
         article.setName(candidate.getName());
         article.setSlug(sluggify.apply(candidate.getName()));

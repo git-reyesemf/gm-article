@@ -7,6 +7,7 @@ import java.io.Serial;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = Category.NAME,
@@ -42,7 +43,7 @@ public class Category extends DomainEntity {
     private String url;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "category", cascade = ALL)
+    @OneToMany(mappedBy = "category", cascade = ALL, fetch = LAZY)
     private List<Article> articles;
 
     public String getName() {

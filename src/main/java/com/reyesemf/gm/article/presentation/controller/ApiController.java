@@ -1,7 +1,5 @@
 package com.reyesemf.gm.article.presentation.controller;
 
-import com.reyesemf.gm.article.datasource.repository.ArticleRepository;
-import com.reyesemf.gm.article.datasource.repository.CategoryRepository;
 import com.reyesemf.gm.article.domain.model.Article;
 import com.reyesemf.gm.article.domain.model.Category;
 import com.reyesemf.gm.article.domain.service.ArticleService;
@@ -28,16 +26,10 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ApiController {
 
     @Autowired
-    private ArticleService articleService;
-    
-    @Autowired
     private CategoryService categoryService;
-    
+
     @Autowired
-    private ArticleRepository articleRepository;
-    
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private ArticleService articleService;
 
     @GetMapping("/category")
     @Operation(summary = "Obtener todas las categorías", description = "Devuelve una lista con todas las categorías disponibles")
@@ -45,7 +37,7 @@ public class ApiController {
             @ApiResponse(responseCode = "200", description = "Lista de categorías obtenida exitosamente")
     })
     public ResponseEntity<List<Category>> getAllCategories() {
-        return ok(categoryRepository.findAll());
+        return ok(categoryService.getAll());
     }
 
     @GetMapping("/category/{category_slug}/articles")
@@ -57,7 +49,7 @@ public class ApiController {
     public ResponseEntity<List<Article>> getAllArticlesByCategory(
             @Parameter(description = "Slug de la categoría", required = true)
             @PathVariable("category_slug") String categorySlug) {
-        return ok(articleRepository.findAllByCategorySlug(categorySlug));
+        return ok(articleService.getAllByCategorySlug(categorySlug));
     }
 
     @GetMapping("/article/{article_slug}")

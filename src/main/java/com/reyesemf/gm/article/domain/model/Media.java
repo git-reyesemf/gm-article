@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @Table(name = Media.NAME,
         uniqueConstraints = {
@@ -40,7 +42,7 @@ public class Media extends DomainEntity {
     private String url;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "relatedMedia")
+    @ManyToMany(mappedBy = "relatedMedia", fetch = LAZY)
     private List<Article> articles;
 
     public String getName() {

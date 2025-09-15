@@ -45,7 +45,7 @@ public class ApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoría obtenida exitosamente")
     })
-    public ResponseEntity<Category> getCategory(@PathVariable String categorySlug) {
+    public ResponseEntity<Category> getCategory(@PathVariable("category_slug") String categorySlug) {
         return ok(categoryService.getBySlug(categorySlug));
     }
 

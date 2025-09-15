@@ -5,7 +5,6 @@ import org.hibernate.annotations.PartitionKey;
 
 import java.io.Serial;
 
-import static com.reyesemf.gm.article.domain.model.Outbox.Status.*;
 import static jakarta.persistence.EnumType.STRING;
 
 @Entity
@@ -18,18 +17,17 @@ import static jakarta.persistence.EnumType.STRING;
 public class Outbox extends DomainEntity {
 
     public enum Status {
-        NEW,
         PENDING,
         SUCCESS,
         FAILURE;
     }
 
     public enum EntityType {
-        TAXABLE_EVENT
+        CATEGORY, ARTICLE
     }
 
     public enum EventType {
-        DETECTED_TAXABLE_EVENT
+        ARTICLE_DETECTION
     }
 
     public static final String NAME = "outbox";
@@ -105,45 +103,6 @@ public class Outbox extends DomainEntity {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public boolean isDetectedTaxableEvent() {
-        return EventType.DETECTED_TAXABLE_EVENT.equals(this.eventType);
-    }
-
-    private void transition(Boolean condition, Status newStatus) {
-        if (!condition) {
-            throw new IllegalStateException();
-        }
-        status = newStatus;
-    }
-
-    public boolean isPending() {
-        return PENDING.equals(status);
-    }
-
-    public boolean isNew() {
-        return NEW.equals(status);
-    }
-
-    public boolean isSuccess() {
-        return SUCCESS.equals(status);
-    }
-
-    public boolean isFailure() {
-        return FAILURE.equals(status);
-    }
-
-    public void pending() {
-        transition(isNew(), PENDING);
-    }
-
-    public void success() {
-        transition(isPending(), SUCCESS);
-    }
-
-    public void failure() {
-        transition(isPending(), FAILURE);
     }
 
 }

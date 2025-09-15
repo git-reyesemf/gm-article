@@ -35,7 +35,7 @@ class ApiControllerIntegrationTest {
 
     @Test
     @DisplayName("GET /api/category - Debería retornar todas las categorías con status 200")
-    void getAllCategories_ShouldReturnAllCategoriesWithStatus200() throws Exception {
+    void givenValidRequestWhenGetAllCategoriesThenReturnsAllCategoriesWithStatus200() throws Exception {
         mockMvc.perform(get("/api/category")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -54,7 +54,7 @@ class ApiControllerIntegrationTest {
 
     @Test
     @DisplayName("GET /api/category/{category_slug}/articles - Debería retornar artículos de la categoría con status 200")
-    void getAllArticlesByCategory_ShouldReturnArticlesForCategoryWithStatus200() throws Exception {
+    void givenValidCategorySlugWhenGetAllArticlesByCategoryThenReturnsArticlesWithoutRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/category/{categorySlug}/articles", "automotores")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -63,13 +63,17 @@ class ApiControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].name", is("Mobil 1 Advanced Full Synthetic 5W-30")))
                 .andExpect(jsonPath("$[0].slug", is("mobil-1-advanced-5w30")))
                 .andExpect(jsonPath("$[0].description", containsString("Aceite sintético premium")))
+                .andExpect(jsonPath("$[0].related_media").doesNotExist())
                 .andExpect(jsonPath("$[1].name", is("Castrol GTX High Mileage 20W-50")))
-                .andExpect(jsonPath("$[1].slug", is("castrol-gtx-20w50")));
+                .andExpect(jsonPath("$[1].slug", is("castrol-gtx-20w50")))
+                .andExpect(jsonPath("$[*].related_media").doesNotExist())
+                .andExpect(jsonPath("$[1].related_media").doesNotExist())
+                .andExpect(jsonPath("$[2].related_media").doesNotExist());
     }
 
     @Test
     @DisplayName("GET /api/article/{article_slug} - Debería retornar el artículo específico con status 200")
-    void getArticle_ShouldReturnSpecificArticleWithStatus200() throws Exception {
+    void givenValidArticleSlugWhenGetArticleThenReturnsArticleWithRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/article/{articleSlug}", "mobil-1-advanced-5w30")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> System.out.println("JSON Response: " + result.getResponse().getContentAsString()))
@@ -78,6 +82,10 @@ class ApiControllerIntegrationTest {
                 .andExpect(jsonPath("$.name", is("Mobil 1 Advanced Full Synthetic 5W-30")))
                 .andExpect(jsonPath("$.slug", is("mobil-1-advanced-5w30")))
                 .andExpect(jsonPath("$.description", containsString("Aceite sintético premium")))
-                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")));
+                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")))
+                .andExpect(jsonPath("$.related_media", hasSize(3)))
+                .andExpect(jsonPath("$.related_media[0].name", is("Tutorial Mantenimiento Automotor")))
+                .andExpect(jsonPath("$.related_media[1].name", is("Aceite Mobil 1 Vista Lateral")))
+                .andExpect(jsonPath("$.related_media[2].name", is("Aceite Mobil 1 Etiqueta")));
     }
 }

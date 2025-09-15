@@ -8,6 +8,7 @@ import com.reyesemf.gm.article.infrastructure.Sluggify;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,11 +26,13 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> getAll() {
         return categoryRepository.findAll();
     }
 
     @Override
+    @Transactional
     public Category createOrUpdate(Category candidate) {
         categoryValidator.accept(candidate);
 
@@ -52,6 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getBySlug(String categorySlug) {
         requireNonNull(categorySlug, "Category Slug must be not null");
         return categoryRepository.findBySlug(categorySlug)
@@ -59,6 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteBySlug(String categorySlug) {
         requireNonNull(categorySlug, "Category Slug must be not null");
         Category candidate = categoryRepository.findBySlug(categorySlug)

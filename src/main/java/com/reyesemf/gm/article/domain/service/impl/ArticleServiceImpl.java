@@ -32,12 +32,14 @@ public class ArticleServiceImpl implements ArticleService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<Article> getAllByCategorySlug(String categorySlug) {
         Category category = categoryService.getBySlug(categorySlug);
         return articleRepository.findAllByCategoryId(category.getId());
     }
 
     @Override
+    @Transactional
     public Article createOrUpdate(Article candidate) {
         articleValidator.accept(candidate);
 
@@ -68,10 +70,12 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleRepository.findBySlug(articleSlug)
                 .orElseThrow(() -> new EntityNotFoundException("Not found article with slug: " + articleSlug));
         article.getRelatedMedia().size();
+        article.setRelatedMediaSupplier(article::getRelatedMedia);
         return article;
     }
 
     @Override
+    @Transactional
     public void deleteBySlug(String articleSlug) {
         requireNonNull(articleSlug, "Article Slug must be not null");
         Article candidate = articleRepository.findBySlug(articleSlug)

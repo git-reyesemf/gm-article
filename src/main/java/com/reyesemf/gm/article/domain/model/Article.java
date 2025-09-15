@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -59,6 +60,14 @@ public class Article extends DomainEntity {
     @JsonIgnore
     @JsonProperty("category_slug")
     private transient String categorySlug;
+
+    @JsonIgnore
+    private transient Supplier<List<Media>> relatedMediaSupplier = () -> null;
+
+    @JsonProperty("related_media")
+    public List<Media> lazyLoadRelatedMedia() {
+        return relatedMediaSupplier.get();
+    }
 
     public String getName() {
         return name;
@@ -122,6 +131,10 @@ public class Article extends DomainEntity {
 
     public void setRelatedMedia(List<Media> relatedMedia) {
         this.relatedMedia = relatedMedia;
+    }
+
+    public void setRelatedMediaSupplier(Supplier<List<Media>> relatedMediaSupplier) {
+        this.relatedMediaSupplier = relatedMediaSupplier;
     }
 
 }

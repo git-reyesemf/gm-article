@@ -10,6 +10,7 @@ import com.reyesemf.gm.article.infrastructure.Sluggify;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -61,10 +62,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Article getBySlug(String articleSlug) {
         requireNonNull(articleSlug, "Article Slug must be not null");
-        return articleRepository.findBySlug(articleSlug)
+        Article article = articleRepository.findBySlug(articleSlug)
                 .orElseThrow(() -> new EntityNotFoundException("Not found article with slug: " + articleSlug));
+        
+        // Forzar inicialización de relatedMedia dentro de la transacción
+        article.getRelatedMedia().size();
+        
+        return article;
     }
 
     @Override

@@ -40,6 +40,15 @@ public class ApiController {
         return ok(categoryService.getAll());
     }
 
+    @GetMapping("/category/{category_slug}")
+    @Operation(summary = "Obtener categoría", description = "Devuelve categpría por slug")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Categoría obtenida exitosamente")
+    })
+    public ResponseEntity<Category> getCategory(@PathVariable String categorySlug) {
+        return ok(categoryService.getBySlug(categorySlug));
+    }
+
     @GetMapping("/category/{category_slug}/articles")
     @Operation(summary = "Obtener artículos por categoría", description = "Devuelve todos los artículos de una categoría específica usando su slug")
     @ApiResponses(value = {

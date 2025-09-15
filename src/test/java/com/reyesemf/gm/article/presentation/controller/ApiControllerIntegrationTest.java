@@ -30,7 +30,6 @@ class ApiControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Configurar MockMvc
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -78,6 +77,6 @@ class ApiControllerIntegrationTest {
                 .andExpect(jsonPath("$.name", is("Mobil 1 Advanced Full Synthetic 5W-30")))
                 .andExpect(jsonPath("$.slug", is("mobil-1-advanced-5w30")))
                 .andExpect(jsonPath("$.description", containsString("Aceite sintético premium")))
-                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")));
+                .andExpect(jsonPath("$.url", is("/articulo/mobil-1-advanced-5w30")));;
     }
 }

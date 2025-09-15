@@ -47,7 +47,6 @@ public class Article extends DomainEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @JsonIgnore
     @ManyToMany(fetch = LAZY)
     @JoinTable(
             name = "article_media",

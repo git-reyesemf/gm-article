@@ -42,6 +42,7 @@ CREATE TABLE article (
     description VARCHAR(500) NOT NULL,
     image VARCHAR(512) NOT NULL,
     url VARCHAR(512) NOT NULL,
+    properties JSON NOT NULL,
     category_id BIGINT NOT NULL,
     updated_at DATETIME DEFAULT NULL,
     version INT NOT NULL DEFAULT 0,

@@ -43,6 +43,9 @@ public class Article extends DomainEntity {
     @Column(name = "url", nullable = false, length = 256)
     private String url;
 
+    @Column(name = "properties", nullable = false, columnDefinition = "JSON")
+    private String properties;
+
     @JsonIgnore
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -107,6 +110,14 @@ public class Article extends DomainEntity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getProperties() {
+        return properties;
+    }
+
+    public void setProperties(String properties) {
+        this.properties = properties;
     }
 
     public Category getCategory() {

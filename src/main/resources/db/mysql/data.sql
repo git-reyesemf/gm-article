@@ -9,6 +9,10 @@ DELETE FROM outbox WHERE 1=1;
 ALTER TABLE category AUTO_INCREMENT = 1;
 ALTER TABLE media AUTO_INCREMENT = 1;
 ALTER TABLE article AUTO_INCREMENT = 1;
+ALTER TABLE action AUTO_INCREMENT = 1;
+ALTER TABLE role AUTO_INCREMENT = 1;
+ALTER TABLE app_user AUTO_INCREMENT = 1;
+ALTER TABLE session AUTO_INCREMENT = 1;
 
 -- CATEGORÍAS
 INSERT INTO category (name, slug, description, image, url, created_at, version) VALUES
@@ -525,5 +529,54 @@ INSERT INTO article_media (article_id, media_id) VALUES
 (79, 8),
 (80, 9),
 (80, 10);
+
+-- ACCIONES
+INSERT INTO action (name, target, description, created_at, version) VALUES
+('GET_ALL_CATEGORIES', '/api/category', 'Listar todas las categorías', CURRENT_TIMESTAMP, 0),
+('GET_CATEGORY', '/api/category/[a-z0-9-]+', 'Ver categoría específica', CURRENT_TIMESTAMP, 0),
+('GET_ALL_ARTICLES_BY_CATEGORY', '/api/category/[a-z0-9-]+/articles', 'Listar artículos por categoría', CURRENT_TIMESTAMP, 0),
+('GET_ARTICLE', '/api/article/[a-z0-9-]+', 'Ver artículo específico por slug', CURRENT_TIMESTAMP, 0),
+('LOGIN', '/api/authentication', 'Autenticación de usuarios', CURRENT_TIMESTAMP, 0);
+
+-- ROLES
+INSERT INTO role (name, description, created_at, version) VALUES
+('admin', 'Administrador con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0),
+('consumer', 'Usuario consumidor con acceso limitado (sin artículo por slug)', CURRENT_TIMESTAMP, 0);
+
+-- USUARIOS
+-- Passwords en formato SHA-256:
+-- admin_password -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (hash de string vacío para testing)
+-- consumer_password -> a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3 (hash de "hello" para testing)
+INSERT INTO app_user (username, email, password, created_at, version) VALUES
+('admin_user', 'admin@example.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', CURRENT_TIMESTAMP, 0),
+('consumer_user', 'consumer@example.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP, 0);
+
+-- ASIGNACIÓN ROLE-ACTION
+-- Admin tiene todas las acciones
+INSERT INTO role_action (role_id, action_id) VALUES
+(1, 1), -- admin -> GET_ALL_CATEGORIES
+(1, 2), -- admin -> GET_CATEGORY  
+(1, 3), -- admin -> GET_ALL_ARTICLES_BY_CATEGORY
+(1, 4), -- admin -> GET_ARTICLE
+(1, 5); -- admin -> LOGIN
+
+-- Consumer tiene todas menos GET_ARTICLE
+INSERT INTO role_action (role_id, action_id) VALUES
+(2, 1), -- consumer -> GET_ALL_CATEGORIES
+(2, 2), -- consumer -> GET_CATEGORY
+(2, 3), -- consumer -> GET_ALL_ARTICLES_BY_CATEGORY (sin GET_ARTICLE)
+(2, 5); -- consumer -> LOGIN
+
+-- ASIGNACIÓN USER-ROLE
+INSERT INTO user_role (user_id, role_id) VALUES
+(1, 1), -- admin_user -> admin
+(2, 2); -- consumer_user -> consumer
+
+-- SESIONES
+INSERT INTO session (token, expires_at, status, user_id, created_at, version) VALUES
+('admin_user', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
+('consumer_user', '2025-12-31 23:59:59', 'ACTIVE', 2, CURRENT_TIMESTAMP, 0),
+('admin_session_2', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
+('expired_session', '2020-01-01 00:00:00', 'CLOSED', 2, CURRENT_TIMESTAMP, 0);
 
 

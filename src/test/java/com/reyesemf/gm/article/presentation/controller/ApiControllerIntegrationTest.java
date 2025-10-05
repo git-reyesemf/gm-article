@@ -12,8 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.reyesemf.gm.article.domain.model.Session.Status.ACTIVE;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -37,6 +39,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/category - Debería retornar todas las categorías con status 200")
     void givenValidRequestWhenGetAllCategoriesThenReturnsAllCategoriesWithStatus200() throws Exception {
         mockMvc.perform(get("/api/category")
+                        .header("X-Auth-Token", "admin_user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -56,6 +59,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/category/{category_slug}/articles - Debería retornar artículos de la categoría con status 200")
     void givenValidCategorySlugWhenGetAllArticlesByCategoryThenReturnsArticlesWithoutRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/category/{categorySlug}/articles", "automotores")
+                        .header("X-Auth-Token", "consumer_user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -75,6 +79,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/article/{article_slug} - Debería retornar el artículo específico con status 200")
     void givenValidArticleSlugWhenGetArticleThenReturnsArticleWithRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/article/{articleSlug}", "mobil-1-advanced-5w30")
+                        .header("X-Auth-Token", "admin_user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> System.out.println("JSON Response: " + result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -87,5 +92,76 @@ class ApiControllerIntegrationTest {
                 .andExpect(jsonPath("$.related_media[0].name", is("Tutorial Mantenimiento Automotor")))
                 .andExpect(jsonPath("$.related_media[1].name", is("Aceite Mobil 1 Vista Lateral")))
                 .andExpect(jsonPath("$.related_media[2].name", is("Aceite Mobil 1 Etiqueta")));
+    }
+
+    @Test
+    @DisplayName("POST /api/authentication - Debería autenticar usuario y retornar sesión con status 200")
+    void givenValidUserCredentialsWhenAuthenticateThenReturnsSessionWithStatus200() throws Exception {
+        String userJson = """
+            {
+                "username": "admin_user",
+                "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+            """;
+
+        mockMvc.perform(post("/api/authentication")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.status", is(ACTIVE)))
+                .andExpect(jsonPath("$.expires_at").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/authentication - Debería fallar con usuario inexistente y retornar status 401")
+    void givenNonExistentUserWhenAuthenticateThenReturnsStatus401() throws Exception {
+        String invalidUserJson = """
+            {
+                "username": "nonexistent_user",
+                "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+            """;
+
+        mockMvc.perform(post("/api/authentication")
+                        .header("X-Auth-Token", "admin_user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidUserJson))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /api/authentication - Debería fallar con password inválido y retornar status 400")
+    void givenInvalidPasswordFormatWhenAuthenticateThenReturnsStatus400() throws Exception {
+        String invalidPasswordJson = """
+            {
+                "username": "admin_user",
+                "password": "invalid-password-format"
+            }
+            """;
+
+        mockMvc.perform(post("/api/authentication")
+                        .header("X-Auth-Token", "admin_user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidPasswordJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("POST /api/authentication - Debería fallar sin token de autorización y retornar status 401")
+    void givenNoAuthTokenWhenAuthenticateThenReturnsStatus401() throws Exception {
+        String userJson = """
+            {
+                "username": "testuser",
+                "email": "test@example.com",
+                "password": "password123"
+            }
+            """;
+
+        mockMvc.perform(post("/api/authentication")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson))
+                .andExpect(status().isUnauthorized());
     }
 }

@@ -35,9 +35,9 @@ server:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.reyesemf.gm.article: DEBUG
-    org.springframework.boot.autoconfigure.jdbc: DEBUG
-    com.zaxxer.hikari: DEBUG
+    com.reyesemf.gm.article: INFO
+    org.springframework.boot.autoconfigure.jdbc: INFO
+    com.zaxxer.hikari: INFO
     root: INFO

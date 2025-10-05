@@ -1,8 +1,15 @@
 -- Compatible con H2 y MySQL
+-- Eliminar datos en orden correcto (respetando foreign keys)
+DELETE FROM session WHERE 1=1;
+DELETE FROM user_role WHERE 1=1;
+DELETE FROM role_action WHERE 1=1;
 DELETE FROM article_media WHERE 1=1;
 DELETE FROM article WHERE 1=1;
 DELETE FROM media WHERE 1=1;
 DELETE FROM category WHERE 1=1;
+DELETE FROM app_user WHERE 1=1;
+DELETE FROM role WHERE 1=1;
+DELETE FROM action WHERE 1=1;
 DELETE FROM outbox WHERE 1=1;
 
 -- Reiniciar secuencias AUTO_INCREMENT
@@ -13,6 +20,7 @@ ALTER TABLE action AUTO_INCREMENT = 1;
 ALTER TABLE role AUTO_INCREMENT = 1;
 ALTER TABLE app_user AUTO_INCREMENT = 1;
 ALTER TABLE session AUTO_INCREMENT = 1;
+ALTER TABLE outbox AUTO_INCREMENT = 1;
 
 -- CATEGORÍAS
 INSERT INTO category (name, slug, description, image, url, created_at, version) VALUES
@@ -540,13 +548,13 @@ INSERT INTO action (name, target, description, created_at, version) VALUES
 
 -- ROLES
 INSERT INTO role (name, description, created_at, version) VALUES
-('admin', 'Administrador con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0),
-('consumer', 'Usuario consumidor con acceso limitado (sin artículo por slug)', CURRENT_TIMESTAMP, 0);
+('ADMIN', 'Administrador con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0),
+('COMMITER', 'Usuario commiter con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0);
 
 -- USUARIOS
 -- Passwords en formato SHA-256:
 -- admin_password -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (hash de string vacío para testing)
--- consumer_password -> a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3 (hash de "hello" para testing)
+-- commiter_password -> a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3 (hash de "hello" para testing)
 INSERT INTO app_user (username, email, password, created_at, version) VALUES
 ('admin_user', 'admin@example.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', CURRENT_TIMESTAMP, 0),
 ('consumer_user', 'consumer@example.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP, 0);
@@ -560,17 +568,18 @@ INSERT INTO role_action (role_id, action_id) VALUES
 (1, 4), -- admin -> GET_ARTICLE
 (1, 5); -- admin -> LOGIN
 
--- Consumer tiene todas menos GET_ARTICLE
+-- Commiter tiene todos los permisos del admin
 INSERT INTO role_action (role_id, action_id) VALUES
-(2, 1), -- consumer -> GET_ALL_CATEGORIES
-(2, 2), -- consumer -> GET_CATEGORY
-(2, 3), -- consumer -> GET_ALL_ARTICLES_BY_CATEGORY (sin GET_ARTICLE)
-(2, 5); -- consumer -> LOGIN
+(2, 1), -- commiter -> GET_ALL_CATEGORIES
+(2, 2), -- commiter -> GET_CATEGORY
+(2, 3), -- commiter -> GET_ALL_ARTICLES_BY_CATEGORY
+(2, 4), -- commiter -> GET_ARTICLE
+(2, 5); -- commiter -> LOGIN
 
 -- ASIGNACIÓN USER-ROLE
 INSERT INTO user_role (user_id, role_id) VALUES
 (1, 1), -- admin_user -> admin
-(2, 2); -- consumer_user -> consumer
+(2, 2); -- consumer_user -> commiter
 
 -- SESIONES
 INSERT INTO session (token, expires_at, status, user_id, created_at, version) VALUES

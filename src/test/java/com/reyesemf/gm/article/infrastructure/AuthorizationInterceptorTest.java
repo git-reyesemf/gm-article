@@ -4,8 +4,6 @@ import com.reyesemf.gm.article.datasource.repository.UserRepository;
 import com.reyesemf.gm.article.domain.model.Session;
 import com.reyesemf.gm.article.domain.model.User;
 import com.reyesemf.gm.article.domain.service.AuthenticationService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +19,10 @@ import org.springframework.web.method.HandlerMethod;
 
 import java.lang.reflect.Method;
 
-import static com.reyesemf.gm.article.domain.model.ActionName.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.reyesemf.gm.article.domain.model.ActionName.GET_ALL_CATEGORIES;
+import static com.reyesemf.gm.article.domain.model.ActionName.LOGIN;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("local")
@@ -120,11 +120,29 @@ public class AuthorizationInterceptorTest {
             () -> authorizationInterceptor.preHandle(request, response, nonHandlerMethod));
     }
 
+    @Test
+    public void givenLoginActionWhenPreHandleThenSkipValidationAndReturnTrue() throws Exception {
+        // Given - no token header (should normally fail, but LOGIN should be skipped)
+        Method method = TestController.class.getMethod("loginEndpoint");
+        HandlerMethod handlerMethod = new HandlerMethod(new TestController(), method);
+
+        // When
+        boolean result = authorizationInterceptor.preHandle(request, response, handlerMethod);
+
+        // Then
+        assertTrue(result);
+        // Verify that authenticationService.validate was never called
+        // (we can't verify this easily without mocking, but the test passing means it worked)
+    }
+
     // Test controller class for reflection
     public static class TestController {
         
         @RequiredAction(GET_ALL_CATEGORIES)
         public void protectedEndpoint() {}
+        
+        @RequiredAction(LOGIN)
+        public void loginEndpoint() {}
         
         public void unprotectedEndpoint() {}
     }

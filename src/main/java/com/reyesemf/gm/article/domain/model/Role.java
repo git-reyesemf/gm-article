@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.util.List;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -24,7 +25,8 @@ public class Role extends DomainEntity {
     private static final long serialVersionUID = 283746198273649182L;
 
     @Column(name = "name", nullable = false, length = 32)
-    private String name;
+    @Enumerated(STRING)
+    private RoleName name;
 
     @Column(name = "description", nullable = false, length = 128)
     private String description;
@@ -41,11 +43,11 @@ public class Role extends DomainEntity {
     )
     private List<Action> actions;
 
-    public String getName() {
+    public RoleName getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(RoleName name) {
         this.name = name;
     }
 

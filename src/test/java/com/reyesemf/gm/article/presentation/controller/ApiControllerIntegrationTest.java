@@ -110,7 +110,7 @@ class ApiControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.token").exists())
-                .andExpect(jsonPath("$.status", is(ACTIVE)))
+                .andExpect(jsonPath("$.status", is(ACTIVE.name())))
                 .andExpect(jsonPath("$.expires_at").exists());
     }
 

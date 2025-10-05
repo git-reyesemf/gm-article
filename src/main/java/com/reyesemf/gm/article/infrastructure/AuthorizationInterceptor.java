@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import static com.reyesemf.gm.article.domain.model.ActionName.LOGIN;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
 
@@ -28,7 +29,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             throw new InternalAuthenticationServiceException("Unhandled Action");
         }
 
-        authenticationService.validate(request.getHeader(AUTH_TOKEN), required);
+        if (!LOGIN.equals(required.value())) {
+            authenticationService.validate(request.getHeader(AUTH_TOKEN), required);
+        }
 
         return TRUE;
 

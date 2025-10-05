@@ -48,9 +48,9 @@ public class PresentationConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Temporalmente deshabilitado para que los tests existentes sigan funcionando
-        // registry.addInterceptor(authorizationInterceptor)
-        //         .addPathPatterns("/api/**"); // Solo aplicar a APIs
+        registry.addInterceptor(authorizationInterceptor)
+                .addPathPatterns("/api/**") // Solo aplicar a APIs
+                .excludePathPatterns("/api/authentication"); // Excluir endpoint de login
     }
 
     @Override

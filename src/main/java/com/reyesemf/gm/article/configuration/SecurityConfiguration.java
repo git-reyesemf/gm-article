@@ -1,6 +1,6 @@
 package com.reyesemf.gm.article.configuration;
 
-import com.reyesemf.gm.article.configuration.security.AuthorizationFilter;
+import com.reyesemf.gm.article.configuration.security.AuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
 
     @Autowired
-    private AuthorizationFilter authorizationFilter;
+    private AuthenticationFilter authenticationFilter;
 
     /**
      * Configuración principal de la cadena de filtros de seguridad.
@@ -43,9 +43,9 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/**").permitAll() // El filtro TokenAuthenticationFilter valida todos los /api/**
+                .requestMatchers("/api/**").permitAll() // El filtro AuthorizationFilter valida todos los /api/**
             )
-            .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); // Para H2 Console
         
         return http.build();

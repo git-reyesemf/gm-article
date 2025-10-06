@@ -8,8 +8,8 @@ import com.reyesemf.gm.article.domain.service.AuthenticationService;
 import com.reyesemf.gm.article.infrastructure.RequiredAction;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Service;
@@ -64,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         if (!session.getUser().hasAction(required)) {
-            throw new AccessDeniedException("Forbidden action");
+            throw new DisabledException("Forbidden action");
         }
 
         session.setExpiresAt(now().plusHours(1));

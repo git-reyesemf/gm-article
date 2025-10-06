@@ -3,13 +3,10 @@ package com.reyesemf.gm.article.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import com.reyesemf.gm.article.infrastructure.AuthorizationInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -22,14 +19,24 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static java.util.TimeZone.getTimeZone;
 
+/**
+ * Configuración de presentación y serialización.
+ * 
+ * <p>Configura el ObjectMapper de Jackson con:
+ * <ul>
+ *   <li>Snake case para nombres de propiedades</li>
+ *   <li>Formato ISO 8601 para fechas</li>
+ *   <li>Módulos JavaTime y Afterburner</li>
+ * </ul>
+ * 
+ * <p>Nota: La autenticación ahora se maneja en {@link SecurityConfiguration}
+ * usando Spring Security en lugar de interceptores.
+ */
 @Configuration
 @EnableAutoConfiguration
 public class PresentationConfiguration implements WebMvcConfigurer {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-    @Autowired
-    private AuthorizationInterceptor authorizationInterceptor;
 
     @Bean
     @Primary
@@ -44,13 +51,6 @@ public class PresentationConfiguration implements WebMvcConfigurer {
         objectMapper.disable(ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         objectMapper.setDateFormat(dateFormat());
         return objectMapper;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authorizationInterceptor)
-                .addPathPatterns("/api/**") // Solo aplicar a APIs
-                .excludePathPatterns("/api/authentication"); // Excluir endpoint de login
     }
 
     @Override

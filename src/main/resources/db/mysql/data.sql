@@ -549,15 +549,15 @@ INSERT INTO action (name, target, description, created_at, version) VALUES
 -- ROLES
 INSERT INTO role (name, description, created_at, version) VALUES
 ('ADMIN', 'Administrador con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0),
-('COMMITER', 'Usuario commiter con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0);
+('API_USER', 'Usuario API con acceso completo a todas las APIs', CURRENT_TIMESTAMP, 0);
 
 -- USUARIOS
 -- Passwords en formato SHA-256:
--- admin_password -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (hash de string vacío para testing)
--- commiter_password -> a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3 (hash de "hello" para testing)
+-- admin -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (hash de string vacío)
+-- api -> 14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479 (hash de "api")
 INSERT INTO app_user (username, email, password, created_at, version) VALUES
-('admin_user', 'admin@example.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', CURRENT_TIMESTAMP, 0),
-('consumer_user', 'consumer@example.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP, 0);
+('admin', 'admin@example.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', CURRENT_TIMESTAMP, 0),
+('api', 'api@example.com', '14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479', CURRENT_TIMESTAMP, 0);
 
 -- ASIGNACIÓN ROLE-ACTION
 -- Admin tiene todas las acciones
@@ -568,23 +568,23 @@ INSERT INTO role_action (role_id, action_id) VALUES
 (1, 4), -- admin -> GET_ARTICLE
 (1, 5); -- admin -> LOGIN
 
--- Commiter tiene todos los permisos del admin
+-- API_USER tiene todos los permisos
 INSERT INTO role_action (role_id, action_id) VALUES
-(2, 1), -- commiter -> GET_ALL_CATEGORIES
-(2, 2), -- commiter -> GET_CATEGORY
-(2, 3), -- commiter -> GET_ALL_ARTICLES_BY_CATEGORY
-(2, 4), -- commiter -> GET_ARTICLE
-(2, 5); -- commiter -> LOGIN
+(2, 1), -- api_user -> GET_ALL_CATEGORIES
+(2, 2), -- api_user -> GET_CATEGORY
+(2, 3), -- api_user -> GET_ALL_ARTICLES_BY_CATEGORY
+(2, 4), -- api_user -> GET_ARTICLE
+(2, 5); -- api_user -> LOGIN
 
 -- ASIGNACIÓN USER-ROLE
 INSERT INTO user_role (user_id, role_id) VALUES
-(1, 1), -- admin_user -> admin
-(2, 2); -- consumer_user -> commiter
+(1, 1), -- admin -> ADMIN
+(2, 2); -- api -> API_USER
 
 -- SESIONES
 INSERT INTO session (token, expires_at, status, user_id, created_at, version) VALUES
-('admin_user', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
-('consumer_user', '2025-12-31 23:59:59', 'ACTIVE', 2, CURRENT_TIMESTAMP, 0),
+('admin_session_1', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
+('api_session_1', '2025-12-31 23:59:59', 'ACTIVE', 2, CURRENT_TIMESTAMP, 0),
 ('admin_session_2', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
 ('expired_session', '2020-01-01 00:00:00', 'CLOSED', 2, CURRENT_TIMESTAMP, 0);
 

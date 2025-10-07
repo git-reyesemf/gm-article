@@ -35,7 +35,7 @@ public class AuthenticationServiceImplTest {
     @BeforeEach
     public void setUp() {
         // Use existing test user from data.sql
-        testUser = userRepository.findByUsername("admin_user")
+        testUser = userRepository.findByUsername("admin")
                 .orElseThrow(() -> new RuntimeException("Test user not found"));
     }
 

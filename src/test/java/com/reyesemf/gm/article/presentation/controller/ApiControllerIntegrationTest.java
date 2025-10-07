@@ -39,7 +39,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/category - Debería retornar todas las categorías con status 200")
     void givenValidRequestWhenGetAllCategoriesThenReturnsAllCategoriesWithStatus200() throws Exception {
         mockMvc.perform(get("/api/category")
-                        .header("X-Auth-Token", "admin_user")
+                        .header("X-Auth-Token", "admin_session_1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -59,7 +59,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/category/{category_slug}/articles - Debería retornar artículos de la categoría con status 200")
     void givenValidCategorySlugWhenGetAllArticlesByCategoryThenReturnsArticlesWithoutRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/category/{categorySlug}/articles", "automotores")
-                        .header("X-Auth-Token", "consumer_user")
+                        .header("X-Auth-Token", "api_session_1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ class ApiControllerIntegrationTest {
     @DisplayName("GET /api/article/{article_slug} - Debería retornar el artículo específico con status 200")
     void givenValidArticleSlugWhenGetArticleThenReturnsArticleWithRelatedMediaAndStatus200() throws Exception {
         mockMvc.perform(get("/api/article/{articleSlug}", "mobil-1-advanced-5w30")
-                        .header("X-Auth-Token", "admin_user")
+                        .header("X-Auth-Token", "admin_session_1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> System.out.println("JSON Response: " + result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -99,7 +99,7 @@ class ApiControllerIntegrationTest {
     void givenValidUserCredentialsWhenAuthenticateThenReturnsSessionWithStatus200() throws Exception {
         String userJson = """
             {
-                "username": "admin_user",
+                "username": "admin",
                 "password": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             }
             """;
@@ -125,7 +125,7 @@ class ApiControllerIntegrationTest {
             """;
 
         mockMvc.perform(post("/api/authentication")
-                        .header("X-Auth-Token", "admin_user")
+                        .header("X-Auth-Token", "admin_session_1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidUserJson))
                 .andExpect(status().isUnauthorized());
@@ -136,13 +136,13 @@ class ApiControllerIntegrationTest {
     void givenInvalidPasswordFormatWhenAuthenticateThenReturnsStatus400() throws Exception {
         String invalidPasswordJson = """
             {
-                "username": "admin_user",
+                "username": "admin",
                 "password": "invalid-password-format"
             }
             """;
 
         mockMvc.perform(post("/api/authentication")
-                        .header("X-Auth-Token", "admin_user")
+                        .header("X-Auth-Token", "admin_session_1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidPasswordJson))
                 .andExpect(status().isBadRequest());

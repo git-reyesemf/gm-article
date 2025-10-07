@@ -7,9 +7,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -25,10 +22,10 @@ import static java.util.Objects.isNull;
 
 /**
  * Filtro de autenticación basado en tokens para Spring Security.
- * 
+ *
  * <p>Este filtro intercepta todas las peticiones HTTP a endpoints anotados con {@link RequiredAction}
  * y valida el token de sesión enviado en el header 'x-auth-token'.</p>
- * 
+ *
  * <p><strong>Flujo de autenticación:</strong></p>
  * <ol>
  *   <li>Lee el header 'x-auth-token' del request</li>
@@ -36,22 +33,22 @@ import static java.util.Objects.isNull;
  *   <li>Verifica que el usuario tiene permisos para la acción requerida</li>
  *   <li>Configura el {@link SecurityContextHolder} con {@link SessionAuthentication}</li>
  * </ol>
- * 
+ *
  * <p><strong>Endpoints públicos:</strong></p>
  * <ul>
  *   <li>/api/authentication - No requiere token (LOGIN)</li>
  *   <li>/h2-console/** - Consola H2 (solo desarrollo)</li>
  *   <li>/swagger-ui/** - Documentación Swagger</li>
  * </ul>
- * 
+ *
  * <p><strong>Endpoints protegidos:</strong></p>
  * <p>Todos los demás endpoints bajo /api/** requieren el header 'x-auth-token' con un token válido.</p>
- * 
+ *
  * <p><strong>Ejemplo de uso:</strong></p>
  * <pre>
- * curl -H "x-auth-token: CDF4F9739EA84A7F9572..." http://localhost:8080/api/category
+ * curl -H "x-auth-token: CDF4F9739EA84A7F9572..." <a href="http://localhost:8080/api/category">...</a>
  * </pre>
- * 
+ *
  * @see AuthenticationService
  * @see SessionAuthentication
  * @see RequiredAction
@@ -75,7 +72,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+            @NonNull FilterChain filterChain) throws ServletException {
 
         try {
             HandlerExecutionChain handlerChain = handlerMapping.getHandler(request);

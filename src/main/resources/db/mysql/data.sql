@@ -553,10 +553,10 @@ INSERT INTO role (name, description, created_at, version) VALUES
 
 -- USUARIOS
 -- Passwords en formato SHA-256:
--- admin -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (hash de string vacío)
+-- admin -> 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918 (hash de "admin")
 -- api -> 14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479 (hash de "api")
 INSERT INTO app_user (username, email, password, created_at, version) VALUES
-('admin', 'admin@example.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', CURRENT_TIMESTAMP, 0),
+('admin', 'admin@example.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', CURRENT_TIMESTAMP, 0),
 ('api', 'api@example.com', '14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479', CURRENT_TIMESTAMP, 0);
 
 -- ASIGNACIÓN ROLE-ACTION

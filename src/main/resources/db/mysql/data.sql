@@ -553,11 +553,11 @@ INSERT INTO role (name, description, created_at, version) VALUES
 
 -- USUARIOS
 -- Passwords en formato SHA-256:
--- admin -> 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918 (hash de "admin")
--- api -> 14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479 (hash de "api")
+-- admin -> ff960cb55673958c594d0daaab1e368651c75c02f9687192a1811e7b180336a7 (hash de "prueba123")
+-- api -> ff960cb55673958c594d0daaab1e368651c75c02f9687192a1811e7b180336a7 (hash de "prueba123")
 INSERT INTO app_user (username, email, password, created_at, version) VALUES
-('admin', 'admin@example.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', CURRENT_TIMESTAMP, 0),
-('api', 'api@example.com', '14c2529eb4498c5d1ffd6915d05bf58a91bdda796af59f41d480d11c099d0479', CURRENT_TIMESTAMP, 0);
+('admin', 'admin@example.com', 'ff960cb55673958c594d0daaab1e368651c75c02f9687192a1811e7b180336a7', CURRENT_TIMESTAMP, 0),
+('api', 'api@example.com', 'ff960cb55673958c594d0daaab1e368651c75c02f9687192a1811e7b180336a7', CURRENT_TIMESTAMP, 0);
 
 -- ASIGNACIÓN ROLE-ACTION
 -- Admin tiene todas las acciones

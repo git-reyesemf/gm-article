@@ -582,10 +582,7 @@ INSERT INTO user_role (user_id, role_id) VALUES
 (2, 2); -- api -> API_USER
 
 -- SESIONES
-INSERT INTO session (token, expires_at, status, user_id, created_at, version) VALUES
-('admin_session_1', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
-('api_session_1', '2025-12-31 23:59:59', 'ACTIVE', 2, CURRENT_TIMESTAMP, 0),
-('admin_session_2', '2025-12-31 23:59:59', 'ACTIVE', 1, CURRENT_TIMESTAMP, 0),
-('expired_session', '2020-01-01 00:00:00', 'CLOSED', 2, CURRENT_TIMESTAMP, 0);
+-- Las sesiones se crean dinámicamente al hacer login
+-- No se insertan sesiones estáticas para permitir que el sistema genere tokens dinámicos
 
 

@@ -98,11 +98,20 @@ public class ApiController {
      * "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
      * </pre>
      * 
+     * <p><strong>Uso del token retornado:</strong></p>
+     * <p>La sesión retornada incluye un campo 'token' que debe enviarse en el header
+     * 'x-auth-token' para todas las peticiones subsecuentes a endpoints protegidos.</p>
+     * <p>Ejemplo:</p>
+     * <pre>
+     * curl -H "x-auth-token: {token_de_sesion}" http://localhost:8080/api/category
+     * </pre>
+     * 
      * <p><strong>Nota:</strong> Otros campos del objeto User (como email, roles, etc.) 
      * son opcionales para la autenticación y serán ignorados.</p>
      *
      * @param credentials Objeto User con username y password requeridos
-     * @return ResponseEntity con la sesión creada si la autenticación es exitosa
+     * @return ResponseEntity con la sesión creada si la autenticación es exitosa. 
+     *         El campo 'token' debe usarse en el header 'x-auth-token' para requests subsecuentes.
      * @throws IllegalArgumentException si el password no tiene formato válido
      * @throws org.springframework.security.web.authentication.session.SessionAuthenticationException si las credenciales son inválidas
      */
@@ -110,7 +119,7 @@ public class ApiController {
     @RequiredAction(LOGIN)
     @Operation(
         summary = "Autenticación de usuario", 
-        description = "Autentica un usuario con username y password y retorna una sesión activa"
+        description = "Autentica un usuario con username y password y retorna una sesión activa con un token que debe usarse en el header 'x-auth-token' para todas las peticiones subsecuentes."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Autenticación exitosa - Retorna sesión activa"),

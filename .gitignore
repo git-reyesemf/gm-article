@@ -12,7 +12,7 @@ build/
 *.ipr
 out/
 .vscode/
-bin/
+# bin/
 
 # OS
 .DS_Store

@@ -31,7 +31,7 @@ public class Session extends DomainEntity {
     @Serial
     private static final long serialVersionUID = 384756291847365928L;
 
-    @Column(name = "token", nullable = false, length = 64, unique = true)
+    @Column(name = "token", nullable = false, length = 32, unique = true)
     private String token;
 
     @Column(name = "expires_at", nullable = false)
